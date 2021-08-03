@@ -151,6 +151,7 @@ const HomeScreen = ({params}) => {
       )}
 
       <FlatList
+        style={styles.flatListStyle}
         data={data}
         renderItem={renderItem => <ItemData data={renderItem} />}
         keyExtractor={(item, index) => index.toString()}
@@ -179,6 +180,7 @@ const styles = StyleSheet.create({
   dateBox: {
     borderWidth: 1,
     borderColor: '#ddd',
+    backgroundColor: 'white',
     padding: 10,
   },
   titleText: {
@@ -201,6 +203,10 @@ const styles = StyleSheet.create({
   },
   errorMsg: {
     color: 'red',
+    marginTop: 10,
+  },
+  flatListStyle: {
+    flex: 1,
     marginTop: 10,
   },
 });

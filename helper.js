@@ -9,15 +9,39 @@ function formatDate(date) {
   var d = new Date(date),
     month = '' + (d.getMonth() + 1),
     date = '' + d.getDate(),
-    year = d.getFullYear();
+    year = d.getFullYear(),
+    days = d.getDay(),
+    hours = d.getHours(),
+    minutes = d.getMinutes();
   if (month.length < 2) {
     month = '0' + month;
   }
   if (date.length < 2) {
     date = '0' + date;
   }
+  return [year, getMonthName(month), date, getDayName(days), hours, minutes];
+}
+function getMonthName(int) {
+  var monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return monthNames[parseInt(int - 1)];
+}
 
-  return [year, month, date].join('-');
+function getDayName(int) {
+  var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return dayNames[parseInt(int)];
 }
 
 export {convertDate, formatDate};
