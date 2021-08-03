@@ -1,112 +1,162 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Text,
   View,
   StyleSheet,
+  Platform,
+  Text,
+  FlatList,
+  Image,
   TouchableOpacity,
-  PermissionsAndroid,
 } from 'react-native';
-import GoogleFit, {Scopes} from 'react-native-google-fit';
+import {convertDate} from './helper';
 import {useNavigation} from '@react-navigation/native';
+import Fitness from '@ovalmoney/react-native-fitness';
+import GFit from './GFiit';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import ItemData from './itemSteps';
 
 const HomeScreen = ({params}) => {
   const navigation = useNavigation();
-  function checkAndTakePermission() {
-    checkAuthorization()
-      .then(val => {
-        if (!val) {
-          googleFitAuth();
-        }
-        console.log('checkAuthorization in if case', val);
-      })
-      .catch(err => {
-        console.log('checkAuthorization Catch', err);
-      });
-  }
+  const [show, setShow] = useState(false);
+  const [mode, setMode] = useState('');
+  const [data, setData] = useState();
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().setHours(0, 0, 0, 0)),
+  );
+  const [endDate, seEndDate] = useState(new Date());
 
-  async function checkAuthorization() {
-    await GoogleFit.checkIsAuthorized();
-    console.log('checkAuthorization', GoogleFit.isAuthorized);
-    return GoogleFit.isAuthorized;
-  }
-  function googleFitAuth() {
-    const options = {
-      scopes: [
-        Scopes.FITNESS_ACTIVITY_READ,
-        Scopes.FITNESS_ACTIVITY_WRITE,
-        Scopes.FITNESS_BODY_READ,
-        Scopes.FITNESS_BODY_WRITE,
-      ],
-    };
-    GoogleFit.authorize(options)
-      .then(authResult => {
-        if (authResult.success) {
-          console.log('success');
-          return 'AUTH_SUCCESS';
-        } else {
-          console.log(authResult.message);
-          return authResult.message;
-        }
-      })
-      .catch(() => {
-        console.log('error');
-        return 'AUTH_ERROR';
-      });
-  }
+  useEffect(() => {
+    requestPermissions();
+  }, []);
 
-  const requestCameraPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  const showMode = mode => {
+    setMode(mode);
+    setShow(true);
+  };
+
+  const selectStartDate = (event, selectedDate) => {
+    const currentDate = selectedDate || startDate;
+    setShow(Platform.OS === 'ios');
+    setStartDate(currentDate);
+  };
+
+  const selectEndDate = (event, selectedDate) => {
+    const currentDate = selectedDate || startDate;
+    setShow(Platform.OS === 'ios');
+    seEndDate(currentDate);
+  };
+
+  const requestPermissions = () => {
+    const permissions = [
+      {
+        kind: Fitness.PermissionKinds.Steps,
+        access: Fitness.PermissionAccesses.Write,
+      },
+      {
+        kind: Fitness.PermissionKinds.Distances,
+        access: Fitness.PermissionAccesses.Write,
+      },
+    ];
+
+    Fitness.requestPermissions(permissions)
+      .then(authorized => {
+        // console.log('authorized', authorized);
+        // Do something
+      })
+      .catch(error => {
+        // console.log('error while authorization', error);
+        // Do something
+      });
+  };
+
+  const showStepCount = () => {
+    if (startDate <= endDate) {
+      const permissions = [
         {
-          title: 'Google Fit App Camera Permission',
-          message:
-            'Google Fit needs access to your Location ' +
-            'so you can take track.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
+          kind: Fitness.PermissionKinds.Steps,
+          access: Fitness.PermissionAccesses.Write,
         },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the camera');
-        checkAndTakePermission();
-      } else {
-        console.log('Location permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
+        {
+          kind: Fitness.PermissionKinds.Distances,
+          access: Fitness.PermissionAccesses.Write,
+        },
+      ];
+      Fitness.isAuthorized(permissions)
+        .then(authorized => {
+          if (authorized) {
+            GFit.getSteps({startDate, endDate}).then(data => {
+              // console.log(data);
+              setData(data);
+            });
+          } else {
+            requestPermissions();
+          }
+          // Do something
+        })
+        .catch(error => {
+          requestPermissions();
+          // Do something
+        });
     }
   };
 
+  const datePicker = method => (
+    <DateTimePicker
+      value={startDate}
+      mode={'date'}
+      is24Hour={true}
+      display="default"
+      onChange={method}
+      maximumDate={new Date()}
+      textColor="red"
+    />
+  );
   return (
     <View style={styles.mainContainer}>
-      <TouchableOpacity
-        onPress={() => {
-          requestCameraPermission();
-        }}>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Check and Take permission</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.dateBox}>
+        <Text style={styles.titleText}>Select start Date</Text>
+
+        <TouchableOpacity
+          style={styles.startDateContainer}
+          onPress={() => {
+            showMode('start');
+          }}>
+          <Text style={styles.dateText}>{convertDate(startDate)}</Text>
+          <Image style={styles.tinyLogo} source={require('./calendar.png')} />
+        </TouchableOpacity>
+
+        <Text style={{...styles.titleText, marginTop: 20}}>
+          Select End Date
+        </Text>
+        <TouchableOpacity
+          style={styles.startDateContainer}
+          onPress={() => {
+            showMode('end');
+          }}>
+          <Text style={styles.dateText}>{convertDate(endDate)}</Text>
+          <Image style={styles.tinyLogo} source={require('./calendar.png')} />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
-        style={styles.button}
         onPress={() => {
-          if (checkAuthorization()) {
-            GoogleFit.startRecording(callback => {
-              console.log(callback);
-              navigation.navigate('DetailScreen');
-              // Process data from Google Fit Recording API (no google fit app needed)
-            });
-          } else {
-            alert('check authorization failed');
-          }
+          showStepCount();
         }}>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Start Tracking</Text>
-        </View>
+        <Text style={styles.showStepCount}>show step count</Text>
       </TouchableOpacity>
+      {endDate < startDate && (
+        <Text style={styles.errorMsg}>
+          End date cannot be less than start date
+        </Text>
+      )}
+
+      <FlatList
+        data={data}
+        renderItem={renderItem => <ItemData data={renderItem} />}
+        keyExtractor={(item, index) => index.toString()}
+      />
+
+      {show && datePicker(mode === 'start' ? selectStartDate : selectEndDate)}
     </View>
   );
 };
@@ -115,17 +165,43 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  button: {
-    width: '50%',
-    backgroundColor: '#24A0ED',
-    alignSelf: 'center',
-    margin: 10,
+  startDateContainer: {
+    flexDirection: 'row',
+    padding: 10,
+    alignItems: 'center',
+    paddingHorizontal: 40,
   },
-  buttonText: {
+  tinyLogo: {
+    marginLeft: 20,
+  },
+  dateBox: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+  },
+  titleText: {
     textAlign: 'center',
+  },
+  dateText: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    color: 'black',
+    backgroundColor: '#eee',
+    fontSize: 20,
+  },
+  showStepCount: {
+    backgroundColor: '#990f02',
+    padding: 10,
+    marginTop: 20,
     fontSize: 16,
-    margin: 10,
+    color: 'white',
+  },
+  errorMsg: {
+    color: 'red',
+    marginTop: 10,
   },
 });
 

@@ -947,6 +947,11 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@ovalmoney/react-native-fitness@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@ovalmoney/react-native-fitness/-/react-native-fitness-0.5.3.tgz#7b61dae4c63bb7c26c129b761f463afe80512186"
+  integrity sha512-N+0nifsYPmZIxx8u2Gjlbg9DJ6IpfieSBUKoFQhDpbGctfY22q/pDm9VuqM0ReCxJ9appBFfD5PiNP7YXk0ttg==
+
 "@react-native-community/cli-debugger-ui@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-debugger-ui/-/cli-debugger-ui-5.0.1.tgz#6b1f3367b8e5211e899983065ea2e72c1901d75f"
@@ -1070,6 +1075,13 @@
     strip-ansi "^5.2.0"
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
+
+"@react-native-community/datetimepicker@^3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-3.5.2.tgz#8e6feb30f2620e5abdf565d5fe74c0c04edcf6ae"
+  integrity sha512-TWRuAtr/DnrEcRewqvXMLea2oB+YF+SbtuYLHguALLxNJQLl/RFB7aTNZeF+OoH75zKFqtXECXV1/uxQUpA+sg==
+  dependencies:
+    invariant "^2.2.4"
 
 "@react-native-community/eslint-config@^2.0.0":
   version "2.0.0"
