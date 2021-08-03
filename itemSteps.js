@@ -1,18 +1,29 @@
 import React from 'react';
 import {StyleSheet, View, Text} from 'react-native';
-import {formatDate} from './helper';
+import {formatDate, getHourMinutes} from './helper';
+import moment from 'moment';
 
 const itemSteps = props => {
   const {item} = props.data;
   const date = formatDate(
-    item.startDate.substring(0, item.startDate.length - 5),
+    item.startDate.substring(0, item.startDate.length - 9),
   );
+  const endDate = formatDate(
+    item.endDate.substring(0, item.endDate.length - 9),
+  );
+
+  //   console.log(date);
+  //   console.log(endDate);
+
   const year = date[0];
   const month = date[1];
   const day = date[2];
   const dayName = date[3];
-  const hours = date[4];
-  const minutes = date[5];
+  const startHours = date[4];
+  const startMinutes = date[5];
+
+  const endHours = endDate[4];
+  const endMinutes = endDate[5];
 
   return (
     <View>
@@ -27,10 +38,16 @@ const itemSteps = props => {
         <View style={styles.contentContainer}>
           <View style={styles.timeContainer}>
             <Text style={styles.dayName}>{dayName + ', '}</Text>
-            <Text style={styles.dayName}>{hours + ' '}</Text>
-            <Text style={styles.dayName}>{minutes}</Text>
+            <Text style={styles.dayName}>
+              {getHourMinutes(item.startDate) + ' to '}
+            </Text>
+            <Text style={styles.dayName}>{getHourMinutes(item.endDate)}</Text>
           </View>
-          <Text>steps goes gerre</Text>
+
+          <View style={styles.stepCountContainer}>
+            <Text style={styles.stepsText}>steps count: </Text>
+            <Text style={styles.stepsText}>{item.quantity}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -42,9 +59,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'white',
     borderRadius: 10,
-    marginTop: 10,
+    margin: 6,
     elevation: 6,
-    margin: 2,
     paddingRight: 20,
   },
   line: {
@@ -75,6 +91,12 @@ const styles = StyleSheet.create({
   contentContainer: {
     justifyContent: 'center',
     marginLeft: 10,
+  },
+  stepCountContainer: {
+    flexDirection: 'row',
+  },
+  stepsText: {
+    color: 'crimson',
   },
 });
 

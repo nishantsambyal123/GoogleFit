@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 function convertDate(inputFormat) {
   function pad(s) {
     return s < 10 ? '0' + s : s;
@@ -19,6 +21,7 @@ function formatDate(date) {
   if (date.length < 2) {
     date = '0' + date;
   }
+  console.log(d);
   return [year, getMonthName(month), date, getDayName(days), hours, minutes];
 }
 function getMonthName(int) {
@@ -43,5 +46,8 @@ function getDayName(int) {
   var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return dayNames[parseInt(int)];
 }
+function getHourMinutes(timeStamp) {
+  return moment(timeStamp, 'YYYY-MM-DD HH:mm:SS').format('h:mma');
+}
 
-export {convertDate, formatDate};
+export {convertDate, formatDate, getHourMinutes};
